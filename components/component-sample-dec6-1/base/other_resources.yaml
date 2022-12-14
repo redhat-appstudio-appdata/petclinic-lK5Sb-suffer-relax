@@ -1,0 +1,220 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    maysun: test
+  name: pvc-sample
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  selector:
+    matchExpressions:
+    - key: environment
+      operator: In
+      values:
+      - dev
+    matchLabels:
+      release: stable
+  storageClassName: slow
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    maysun: test
+  name: pvc-sample-2
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  selector:
+    matchExpressions:
+    - key: environment
+      operator: In
+      values:
+      - dev
+    matchLabels:
+      release: stable
+  storageClassName: slow
+  volumeMode: Filesystem
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/created-by: application-service
+    app.kubernetes.io/instance: component-sample
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: application-sample
+    maysun: test
+  name: deploy-sample-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: component-sample
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: component-sample
+    spec:
+      containers:
+      - env:
+        - name: FOO
+          value: foo1
+        - name: BAR
+          value: bar1
+        image: quay.io/redhat-appstudio/user-workload:application-service-system-component-sample
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 1111
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        name: container-image
+        ports:
+        - containerPort: 1111
+        readinessProbe:
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          tcpSocket:
+            port: 1111
+        resources:
+          limits:
+            cpu: "2"
+            memory: 500Mi
+            storage: 400Mi
+          requests:
+            cpu: 700m
+            memory: 400Mi
+            storage: 200Mi
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/created-by: application-service
+    app.kubernetes.io/instance: component-sample
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: application-sample
+    maysun: test
+  name: service-sample-2
+spec:
+  ports:
+  - port: 1111
+    targetPort: 1111
+  selector:
+    app.kubernetes.io/instance: component-sample
+status:
+  loadBalancer: {}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/created-by: application-service
+    app.kubernetes.io/instance: component-sample
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: application-sample
+    maysun: test
+  name: route-sample
+spec:
+  host: route111
+  port:
+    targetPort: 1111
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: component-sample
+    weight: 100
+status: {}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/created-by: application-service
+    app.kubernetes.io/instance: component-sample
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: application-sample
+    maysun: test
+  name: route-sample-2
+spec:
+  host: route111
+  port:
+    targetPort: 1111
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: component-sample
+    weight: 100
+status: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    maysun: test
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  creationTimestamp: null
+  name: ingress-sample
+spec:
+  ingressClassName: nginx-example
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: test
+            port:
+              number: 80
+        path: /testpath
+        pathType: Prefix
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    maysun: test
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  creationTimestamp: null
+  name: ingress-sample-2
+spec:
+  ingressClassName: nginx-example
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: test
+            port:
+              number: 80
+        path: /testpath
+        pathType: Prefix
+status:
+  loadBalancer: {}
+---

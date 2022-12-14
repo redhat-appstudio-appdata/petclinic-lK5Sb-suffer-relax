@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/created-by: application-service
+    app.kubernetes.io/instance: component-sample
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: application-sample
+    maysun: test
+  name: deploy-sample
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: component-sample
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: component-sample
+    spec:
+      containers:
+      - env:
+        - name: FOOFOO
+          value: foo1
+        - name: BARBAR
+          value: bar1
+        - name: FOO
+          value: foo1
+        - name: BAR
+          value: bar1
+        image: quay.io/redhat-appstudio/user-workload:application-service-system-component-sample
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 4444
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        name: container-image
+        ports:
+        - containerPort: 1111
+        - containerPort: 4444
+        readinessProbe:
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          tcpSocket:
+            port: 4444
+        resources:
+          limits:
+            cpu: 133m
+            memory: 333Mi
+            storage: 333Mi
+          requests:
+            cpu: 13m
+            memory: 133Mi
+            storage: 133Mi
+status: {}

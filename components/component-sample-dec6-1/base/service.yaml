@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/created-by: application-service
+    app.kubernetes.io/instance: component-sample
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: application-sample
+    maysun: test
+  name: service-sample
+spec:
+  ports:
+  - port: 1111
+    targetPort: 1111
+  - port: 4444
+    targetPort: 4444
+  selector:
+    app.kubernetes.io/instance: component-sample
+status:
+  loadBalancer: {}

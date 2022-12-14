@@ -1,0 +1,15 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: null
+  name: http-8081
+spec:
+  host: route333
+  path: /
+  port:
+    targetPort: 4444
+  to:
+    kind: Service
+    name: component-sample-dec6-1
+    weight: null
+status: {}
